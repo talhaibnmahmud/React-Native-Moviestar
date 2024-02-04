@@ -18,6 +18,8 @@ const Layout = () => {
 		navigationBarColor: colorTokens.light.green.green7,
 		navigationBarHidden: false,
 		headerBlurEffect: "systemUltraThinMaterialLight",
+		headerBackTitleVisible: true,
+		headerBackTitle: "Back",
 	}} >
 		<Stack.Screen name="index" options={{
 			title: "Moviestar",
@@ -27,10 +29,14 @@ const Layout = () => {
 				pressOpacity={0.5}
 			/>,
 			headerTitleAlign: "center",
+			headerBackTitle: "Back",
+			headerBackTitleVisible: true,
 		}} />
 		<Stack.Screen name="movie/[id]" options={{
 			title: "Movie",
 			headerTitleAlign: "center",
+			headerBackTitle: "Back",
+			headerBackTitleVisible: true,
 		}} />
 	</Stack>;
 };

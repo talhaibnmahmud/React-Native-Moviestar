@@ -39,7 +39,8 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
                     <Image
                         source={{ uri: `https://image.tmdb.org/t/p/w500${movie.poster_path}` }}
                         style={{ width: 150, height: 225, borderRadius: 10 }}
-                        alt={movie.title} />
+                        alt={movie.title}
+                    />
                 </Card.Header>
                 <Card.Footer style={{
                     paddingVertical: 20,
