@@ -1,21 +1,25 @@
 import { colorTokens } from "@tamagui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "expo-router";
 import React from "react";
-import { ImageBackground, Pressable, Text } from "react-native";
-import { Card, Input, Spinner, YStack } from "tamagui";
+import { ImageBackground } from "react-native";
+import { Input, ScrollView, Spinner, YStack } from "tamagui";
+import { MovieCard } from "~/components/MovieCard";
+import { fetchTrendingMovies, searchMovies } from "~/lib/api";
+import type { Search } from "~/schemas/search.schema";
+import type { Trending } from "~/schemas/trending.schema";
 import { Container, Main, Subtitle, Title } from "~/tamagui.config";
 
 const Home = () => {
-	const trendingQuery = useQuery({
+	const [search, setSearch] = React.useState("");
+	const trendingQuery = useQuery<Trending>({
 		queryKey: ["trending"],
-		queryFn: () => fetch("https://api.themoviedb.org/3/trending/movie/week?api_key=2a7b1c6a7b1d4b4b4e2c4b1f5a7b1d4b"),
+		queryFn: () => fetchTrendingMovies(),
+		refetchInterval: 60 * 60 * 1000,
 	})
-	console.log(trendingQuery.data);
 
-	const searchQuery = useQuery({
+	const searchQuery = useQuery<Search>({
 		queryKey: ["search"],
-		queryFn: () => fetch("https://api.themoviedb.org/3/search/movie?api_key=2a7b1c6a7b1d4b4b4e2c4b1f5a7b1d4b&query=avengers"),
+		queryFn: () => searchMovies("avengers"),
 	})
 	console.log(searchQuery.data);
 
@@ -67,7 +71,9 @@ const Home = () => {
 							fontSize: 20,
 							// Move the screen up when the keyboard is open
 							// https://reactnative.dev/docs/keyboard#keyboardavoidingview
-						}} />
+						}}
+							value={search}
+							onChangeText={setSearch} />
 					</YStack>
 				</Container>
 			</ImageBackground>
@@ -81,51 +87,14 @@ const Home = () => {
 				Trending Movies
 			</Subtitle>
 
-			{trendingQuery.isLoading || trendingQuery.isFetching ? <Spinner size="large" /> : null}
+			{trendingQuery.isLoading || trendingQuery.isFetching ? <Spinner size="large" /> :
+				<ScrollView horizontal
+					showsHorizontalScrollIndicator={false}
+					style={{ paddingHorizontal: 20 }}>
+					{trendingQuery.data?.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
+				</ScrollView>
+			}
 			{searchQuery.isLoading || searchQuery.isFetching ? <Spinner size="large" /> : null}
-			<Link href={"/(drawer)/home/movie/1"} asChild>
-				<Pressable style={{
-					width: 300,
-					height: 50,
-					backgroundColor: colorTokens.light.green.green7,
-					alignItems: "center",
-					justifyContent: "center",
-					borderRadius: 10,
-				}}>
-					<Text style={{
-						color: colorTokens.light.green.green11,
-						fontSize: 20,
-						fontWeight: "bold",
-					}}
-					>Movie 1</Text>
-				</Pressable>
-			</Link>
-			<Card style={{
-				width: 300,
-				backgroundColor: colorTokens.light.green.green5,
-			}}>
-				<Card.Header>
-					<Text style={{
-						color: colorTokens.light.green.green11,
-						fontSize: 20,
-						fontWeight: "bold",
-					}}>Header</Text>
-				</Card.Header>
-				<Card.Footer style={{
-					backgroundColor: colorTokens.light.green.green7,
-					paddingHorizontal: 20,
-					paddingVertical: 10,
-					borderBottomStartRadius: 10,
-					borderBottomEndRadius: 10,
-				}}>
-					<Text style={{
-						color: colorTokens.light.green.green11,
-						fontSize: 20,
-						fontWeight: "bold",
-					}}
-					>Footer</Text>
-				</Card.Footer>
-			</Card>
 		</Main>
 	);
 };
