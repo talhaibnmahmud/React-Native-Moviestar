@@ -4,6 +4,7 @@ import React from "react";
 import { ImageBackground } from "react-native";
 import { Input, ScrollView, Spinner, YStack } from "tamagui";
 import { MovieCard } from "~/components/MovieCard";
+import { useDebounce } from "~/hooks/useDebounce";
 import { fetchTrendingMovies, searchMovies } from "~/lib/api";
 import type { Search } from "~/schemas/search.schema";
 import type { Trending } from "~/schemas/trending.schema";
@@ -11,6 +12,8 @@ import { Container, Main, Subtitle, Title } from "~/tamagui.config";
 
 const Home = () => {
 	const [search, setSearch] = React.useState("");
+	const debouncedSearch = useDebounce(search, 500);
+
 	const trendingQuery = useQuery<Trending>({
 		queryKey: ["trending"],
 		queryFn: () => fetchTrendingMovies(),
@@ -18,10 +21,10 @@ const Home = () => {
 	})
 
 	const searchQuery = useQuery<Search>({
-		queryKey: ["search"],
-		queryFn: () => searchMovies("avengers"),
+		queryKey: ["search", debouncedSearch],
+		queryFn: () => searchMovies(debouncedSearch),
+		enabled: debouncedSearch.trim().length > 0,
 	})
-	console.log(searchQuery.data);
 
 	return (
 		<Main style={{
@@ -84,17 +87,16 @@ const Home = () => {
 				fontWeight: "bold",
 				paddingHorizontal: 20,
 			}}>
-				Trending Movies
+				{debouncedSearch.trim().length > 0 ? "Search Results" : "Trending Movies"}
 			</Subtitle>
 
-			{trendingQuery.isLoading || trendingQuery.isFetching ? <Spinner size="large" /> :
+			{searchQuery.isLoading || searchQuery.isFetching || trendingQuery.isLoading || trendingQuery.isFetching ? <Spinner size="large" /> :
 				<ScrollView horizontal
 					showsHorizontalScrollIndicator={false}
 					style={{ paddingHorizontal: 20 }}>
-					{trendingQuery.data?.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
+					{searchQuery.data?.results ? searchQuery.data.results.map((movie) => <MovieCard key={movie.id} movie={movie} />) : trendingQuery.data?.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
 				</ScrollView>
 			}
-			{searchQuery.isLoading || searchQuery.isFetching ? <Spinner size="large" /> : null}
 		</Main>
 	);
 };

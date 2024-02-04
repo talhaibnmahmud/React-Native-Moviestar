@@ -2,10 +2,11 @@ import { colorTokens } from "@tamagui/themes";
 import { Link } from "expo-router";
 import { Image, Text } from "react-native";
 import { Card, Paragraph, YStack } from "tamagui";
-import { Movie } from "~/schemas/trending.schema";
+import type { Movie as SearchedMovie } from "~/schemas/search.schema";
+import type { Movie as TrendingMovie } from "~/schemas/trending.schema";
 
 type MovieCardProps = {
-    movie: Movie;
+    movie: TrendingMovie | SearchedMovie;
 };
 
 export const MovieCard = ({ movie }: MovieCardProps) => {
