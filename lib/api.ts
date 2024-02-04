@@ -40,8 +40,6 @@ export const searchMovies = async (
 	page: number = 1,
 	adult: boolean = true
 ) => {
-	console.log("searchMovies", query, page, adult);
-
 	const encodedQuery = encodeURIComponent(query);
 	const queryParams = new URLSearchParams({
 		query: encodedQuery,
